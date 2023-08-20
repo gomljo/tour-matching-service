@@ -12,12 +12,16 @@
 ---
 ## 🛠 프로젝트 개발 환경
 ### 기술 스택
+
+<div>
 <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=OpenJDK&logoColor=white" alt="java"/>
-<img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=springboot&logoColor=white" alt="java"/>
-<img src="https://img.shields.io/badge/SpringSecurity-6DB33F?style=flat&logo=springboot&logoColor=white" alt="java"/>
-<img src="https://img.shields.io/badge/mysql-4479A1?style=flat&logo=springboot&logoColor=white" alt="java"/>
-<img src="https://img.shields.io/badge/redis-DC382D?style=flat&logo=redis&logoColor=white" alt="java"/>
-<img src="https://img.shields.io/badge/elasticsearch-005571?style=flat&logo=elasticsearch&logoColor=white" alt="java"/>
+<img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=springboot&logoColor=white" alt="SpringBoot"/>
+<img src="https://img.shields.io/badge/SpringSecurity-6DB33F?style=flat&logo=springboot&logoColor=white" alt="SpringSecurity"/>
+<img src="https://img.shields.io/badge/mysql-4479A1?style=flat&logo=springboot&logoColor=white" alt="mysql"/>
+<img src="https://img.shields.io/badge/redis-DC382D?style=flat&logo=redis&logoColor=white" alt="redis"/>
+<img src="https://img.shields.io/badge/elasticsearch-005571?style=flat&logo=elasticsearch&logoColor=white" alt="elasticsearch"/>
+</div>
+
 
 ### 프로젝트 의존성
 |이름| 버전      | 용도              |
