@@ -80,7 +80,7 @@ spring security의 UserDetails,UserDetailsService 등을 재정의하여 커스�
 
 ## 💾 ERD
 <p align="center">
-<img src="./tour_erd.png" height="820" width="1337" alt="erd">
+<img src="./tour_erd.png" alt="erd">
 </p>
 
 ## 🧿 구현 예정 기능
