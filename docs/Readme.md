@@ -159,7 +159,8 @@ spring security의 UserDetails,UserDetailsService 등을 재정의하여 커스�
 #### 여행 후기 좋아요 [review-like]
 - 여행 후기의 좋아요 버튼 클릭 시 좋아요 갯수 추가
 - 클릭한 적이 한번도 없는 사람인 경우에만 갯수 추가
-- 클릭한 적이 있다면 
+- 클릭한 적이 있다면 좋아요 클릭 상태를 non click으로 변경
+- 레디스 spin lock을 활용하여 동시성 제어
 
 
 #### 여행 후기 수정 [review-update]
@@ -219,7 +220,7 @@ spring security의 UserDetails,UserDetailsService 등을 재정의하여 커스�
 
 ### 여행 후기 게시판 [review-board]
 
-- 방문 국가와 도시를 전달받아 여행 후기를 조건에 따라 조회
+방문 국가와 도시를 전달받아 여행 후기를 조건에 따라 조회
 
 
 #### 방문 국가, 도시와 별점 순 조회[review-search]
@@ -228,10 +229,10 @@ spring security의 UserDetails,UserDetailsService 등을 재정의하여 커스�
 #### 검색어에 따라 조회 [review-search-by-keyword]
 
 
-#### 여행지에 따라 조회 [review-search-by-destination]
+#### 방문 국가와 도시에 따라 조회 [review-search-by-destination]
 
 
 #### 좋아요 개수에 따라 조회 [review-search-by-like]
 
 
-#### 가이드 별 조회 [review-search-by-guide]
+#### 가이드 닉네임 별 조회 [review-search-by-guide]
