@@ -85,7 +85,10 @@ spring security의 UserDetails,UserDetailsService 등을 재정의하여 커스�
 
 ## 🧿 구현 예정 기능
 
-### 공통 기능
+### 공통 기능 [common]
+tourist, guide 공통 기능
+
+- 기능 구현 완료 후 커밋 시 implementation keyword의 prefix로 추가
 
 #### 회원 가입 [member-signup]
 - 이름, 이메일, 전화번호, 주소, 비밀번호를 입력받아 회원가입
