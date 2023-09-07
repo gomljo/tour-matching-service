@@ -1,0 +1,3 @@
+[submodule "tour-settings"]
+	path = tour-settings
+	url = https://github.com/gomljo/tour-settings.git
