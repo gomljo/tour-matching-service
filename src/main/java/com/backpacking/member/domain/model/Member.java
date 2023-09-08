@@ -1,6 +1,7 @@
 package com.backpacking.member.domain.model;
 
 import com.backpacking.global.jpa.vo.Audit;
+import com.backpacking.member.constants.VerifiedStatus;
 import com.backpacking.member.domain.vo.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,9 +36,21 @@ public class Member extends Audit {
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private VerifiedStatus verifiedStatus;
+
+    @Column(nullable = false, updatable = false)
+    private String authenticationCode;
 
     @Embedded
     @Builder.Default
     private Address address = new Address();
 
+    public void updateVerifiedStatus(){
+
+        if(this.verifiedStatus==VerifiedStatus.NOT_VERIFIED){
+            this.verifiedStatus = VerifiedStatus.VERIFIED;
+        }
+    }
 }
