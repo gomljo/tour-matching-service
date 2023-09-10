@@ -4,8 +4,6 @@ import com.backpacking.member.domain.model.Member;
 import com.backpacking.member.dto.MemberRegisterDto;
 import com.backpacking.member.dto.VerificationDto;
 import com.backpacking.member.exception.MemberException;
-import com.backpacking.member.mail.dto.MailDto;
-import com.backpacking.member.mail.service.MailService;
 import com.backpacking.member.repository.MemberRepository;
 import com.backpacking.member.type.Roles;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Table;
 import java.util.List;
 
 import static com.backpacking.member.constants.VerifiedStatus.NOT_VERIFIED;
@@ -25,7 +22,6 @@ import static com.backpacking.member.exception.MemberExceptionCode.*;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final MailService mailService;
 
     @Override
     @Transactional
@@ -49,15 +45,20 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member verify(VerificationDto.Request request) {
+    public Member verifyAuthenticationCode(VerificationDto.Request request) {
 
         Member member = memberRepository.findByEmail(request.getUserEmail())
-                .orElseThrow(()->new MemberException(NO_SUCH_MEMBER));
+                .orElseThrow(() -> new MemberException(NO_SUCH_MEMBER));
 
-        if(!mailService.verifyAuthenticationCode(member.getAuthenticationCode(), request.getAuthenticationCode())){
+        if (!member.getAuthenticationCode().equals(request.getAuthenticationCode())) {
             throw new MemberException(INVALID_AUTHENTICATION_CODE);
         }
 
+        return member;
+    }
+
+    @Override
+    public Member updateVerifiedStatus(Member member) {
         member.updateVerifiedStatus();
 
         return memberRepository.save(member);
