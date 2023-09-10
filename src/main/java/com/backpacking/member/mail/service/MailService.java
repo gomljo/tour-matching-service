@@ -6,8 +6,6 @@ public interface MailService {
 
     void sendMail(MailDto mailDto);
     String generateAuthenticationCode();
-    boolean verifyAuthenticationCode(String issuedAuthCode, String requestAuthCode);
-
 
 
 }
