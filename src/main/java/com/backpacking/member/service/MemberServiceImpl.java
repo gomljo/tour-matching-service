@@ -50,7 +50,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByEmail(request.getUserEmail())
                 .orElseThrow(() -> new MemberException(NO_SUCH_MEMBER));
 
-        if (!member.getAuthenticationCode().equals(request.getAuthenticationCode())) {
+        if (!member.isSameAuthCode(request.getAuthenticationCode())) {
             throw new MemberException(INVALID_AUTHENTICATION_CODE);
         }
 
