@@ -34,7 +34,7 @@ public class MemberController {
     }
 
     @PutMapping("/verify")
-    public VerificationDto.Response verify(@RequestBody VerificationDto.Request request) {
+    public VerificationDto.Response verify(@Valid @RequestBody VerificationDto.Request request) {
         Member member = memberService.verifyAuthenticationCode(request);
         return VerificationDto.Response.fromEntity(memberService.updateVerifiedStatus(member));
     }
