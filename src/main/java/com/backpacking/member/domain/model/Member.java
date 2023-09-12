@@ -47,6 +47,10 @@ public class Member extends Audit {
     @Builder.Default
     private Address address = new Address();
 
+
+    public boolean isSameAuthCode(String requestedAuthCode){
+        return this.authenticationCode.equals(requestedAuthCode);
+    }
     public void updateVerifiedStatus(){
 
         if(this.verifiedStatus==VerifiedStatus.NOT_VERIFIED){
