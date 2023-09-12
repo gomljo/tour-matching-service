@@ -2,6 +2,7 @@ package com.backpacking.member.dto;
 
 import com.backpacking.member.constants.VerifiedStatus;
 import com.backpacking.member.domain.model.Member;
+import com.backpacking.member.validation.register.email.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ public class VerificationDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Request {
+        @Email
         private String userEmail;
         private String AuthenticationCode;
     }

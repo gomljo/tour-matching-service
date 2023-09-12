@@ -8,6 +8,7 @@ import com.backpacking.member.dto.VerificationDto;
 import com.backpacking.member.exception.MemberException;
 import com.backpacking.member.exception.MemberExceptionCode;
 import com.backpacking.member.repository.MemberRepository;
+import com.backpacking.member.type.Roles;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +48,7 @@ class MemberServiceTest {
                 .phoneNumber("010-111-1111")
                 .verifiedStatus(VerifiedStatus.NOT_VERIFIED)
                 .authenticationCode(authCode)
-                .roles(List.of("ROLE_TOURIST"))
+                .roles(List.of(Roles.ROLE_TOURIST))
                 .build();
 
         MemberRegisterDto.Request request = new MemberRegisterDto.Request(member.getEmail(),
@@ -78,15 +79,7 @@ class MemberServiceTest {
     @DisplayName("회원 가입 실패 - 가입 요청 이메일 중복")
     void fail_register_redundantEmail() {
         // given
-        Member member = Member.builder()
-                .email("lifi.jw@gmail.com")
-                .password("1q!W23")
-                .address(new Address("korea", "seoul", "detail Address"))
-                .phoneNumber("010-111-1111")
-                .verifiedStatus(VerifiedStatus.NOT_VERIFIED)
-                .authenticationCode("123ER21122")
-                .roles(List.of("ROLE_TOURIST"))
-                .build();
+        Member member = generateMember();
 
         MemberRegisterDto.Request request = new MemberRegisterDto.Request(member.getEmail(),
                 member.getPhoneNumber(), member.getPassword(), member.getRoles(), member.getAddress());
@@ -147,7 +140,7 @@ class MemberServiceTest {
                 .phoneNumber("010-111-1111")
                 .verifiedStatus(VerifiedStatus.NOT_VERIFIED)
                 .authenticationCode("123ER21122")
-                .roles(List.of("ROLE_TOURIST"))
+                .roles(List.of(Roles.ROLE_TOURIST))
                 .build();
     }
 
@@ -160,7 +153,7 @@ class MemberServiceTest {
                 .phoneNumber("010-111-1111")
                 .verifiedStatus(VerifiedStatus.VERIFIED)
                 .authenticationCode("123ER21122")
-                .roles(List.of("ROLE_TOURIST"))
+                .roles(List.of(Roles.ROLE_TOURIST))
                 .build();
     }
 
