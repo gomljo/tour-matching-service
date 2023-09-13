@@ -2,7 +2,7 @@ package com.backpacking.member.controller;
 
 import com.backpacking.global.security.config.SecurityConfig;
 import com.backpacking.global.security.filter.JwtAuthenticationFilter;
-import com.backpacking.global.security.token.JwtTokenProvider;
+import com.backpacking.global.security.token.provider.JwtTokenProvider;
 import com.backpacking.member.constants.VerifiedStatus;
 import com.backpacking.member.domain.model.Member;
 import com.backpacking.member.domain.vo.Address;
@@ -10,6 +10,7 @@ import com.backpacking.member.dto.MemberRegisterDto;
 import com.backpacking.member.dto.VerificationDto;
 import com.backpacking.member.exception.MemberException;
 import com.backpacking.member.service.MemberService;
+import com.backpacking.member.type.Roles;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class MemberControllerTest {
         doNothing().when(mailService).sendMail(any());
 
         MemberRegisterDto.Request request = new MemberRegisterDto.Request(member.getEmail(),
-                member.getPhoneNumber(), member.getPassword(), member.getRoles(), member.getAddress());
+                member.getPhoneNumber(), member.getPassword(), List.of(Roles.ROLE_TOURIST), member.getAddress());
 
         // when
 
@@ -172,7 +173,7 @@ class MemberControllerTest {
                 .phoneNumber("010-111-1111")
                 .verifiedStatus(VerifiedStatus.NOT_VERIFIED)
                 .authenticationCode("123ER21122")
-                .roles(List.of("ROLE_TOURIST"))
+                .roles(List.of(Roles.ROLE_TOURIST))
                 .build();
     }
 
@@ -185,7 +186,7 @@ class MemberControllerTest {
                 .phoneNumber("010-111-1111")
                 .verifiedStatus(VerifiedStatus.VERIFIED)
                 .authenticationCode("123ER21122")
-                .roles(List.of("ROLE_TOURIST"))
+                .roles(List.of(Roles.ROLE_TOURIST))
                 .build();
     }
 

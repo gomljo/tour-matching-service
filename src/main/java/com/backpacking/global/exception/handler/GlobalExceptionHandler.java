@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestControllerAdvice
@@ -35,7 +37,7 @@ public class GlobalExceptionHandler {
         log.error("not runtime");
         BindingResult result = methodArgumentNotValidException.getBindingResult();
 
-        List<String> errors = new ArrayList<>();
+        Set<String> errors = new HashSet<>();
         for (FieldError fieldError: result.getFieldErrors()){
             errors.add("["+fieldError.getField() + "]: " + fieldError.getDefaultMessage());
         }

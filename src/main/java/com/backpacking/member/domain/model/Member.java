@@ -3,6 +3,7 @@ package com.backpacking.member.domain.model;
 import com.backpacking.global.jpa.vo.Audit;
 import com.backpacking.member.constants.VerifiedStatus;
 import com.backpacking.member.domain.vo.Address;
+import com.backpacking.member.type.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +35,7 @@ public class Member extends Audit {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Builder.Default
-    private List<String> roles = new ArrayList<>();
+    private List<Roles> roles = new ArrayList<>();
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

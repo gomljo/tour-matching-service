@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
                 .phoneNumber(request.getPhoneNumber())
                 .verifiedStatus(NOT_VERIFIED)
                 .authenticationCode(authenticationCode)
-                .roles(List.of(Roles.ROLE_TOURIST.toString()))
+                .roles(request.getRoles())
                 .build());
     }
 
