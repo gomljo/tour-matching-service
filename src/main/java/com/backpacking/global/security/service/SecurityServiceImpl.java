@@ -7,7 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import static com.backpacking.member.exception.MemberExceptionCode.NO_SUCH_MEMBER;
+import static com.backpacking.global.security.exception.security.SecurityExceptionCode.NO_SUCH_MEMBER;
+
 
 @Slf4j
 @Service
@@ -21,7 +22,8 @@ public class SecurityServiceImpl implements SecurityService {
         log.info("회원 정보 로딩 시작");
 
         return new SecuredUser(memberRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(NO_SUCH_MEMBER.getDescription())));
+                .orElseThrow(() -> new UsernameNotFoundException(NO_SUCH_MEMBER.getDescription()))
+                );
     }
 
 }
