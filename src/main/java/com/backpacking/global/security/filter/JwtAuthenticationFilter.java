@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -36,10 +37,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        if(!isExcludePathContains(request.getRequestURI())){
-            String accessToken = this.resolveTokenFromRequest(request, TOKEN_HEADER);
-            String refreshToken = this.resolveTokenFromRequest(request, REFRESH_HEADER);
 
+        String accessToken="";
+        String refreshToken="";
+
+        if(!isExcludePathContains(request.getRequestURI())){
+            accessToken = this.resolveTokenFromRequest(request, TOKEN_HEADER);
+            if(StringUtils.hasText(request.getHeader(REFRESH_HEADER))){
+                refreshToken = this.resolveTokenFromRequest(request, REFRESH_HEADER);
+            }
             this.tokenProvider.validateToken(accessToken, refreshToken);
             this.setSecurityContext(accessToken);
         }
