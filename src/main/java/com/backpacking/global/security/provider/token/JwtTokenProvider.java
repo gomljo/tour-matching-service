@@ -104,8 +104,6 @@ public class JwtTokenProvider {
 
     public boolean isValidRefreshToken(String email, String refreshToken){
         String savedRefreshToken = redisService.getRefreshToken(email);
-        log.info(savedRefreshToken);
-        log.info(refreshToken);
         return savedRefreshToken.equals(refreshToken);
     }
 
