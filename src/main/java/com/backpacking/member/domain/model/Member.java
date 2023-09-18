@@ -20,7 +20,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Table(name = "member")
 public class Member extends Audit {
 
     @Id
@@ -58,4 +57,19 @@ public class Member extends Audit {
             this.verifiedStatus = VerifiedStatus.VERIFIED;
         }
     }
+
+    public void registerGuideRole(){
+        List<Roles> newRoles = new ArrayList<>(this.roles);
+        newRoles.add(Roles.ROLE_GUIDE);
+        this.roles = newRoles;
+    }
+
+    public void deleteGuideRole(){
+        List<Roles> newRoles = new ArrayList<>(this.roles);
+        if(this.roles.contains(Roles.ROLE_GUIDE)){
+            newRoles.remove(Roles.ROLE_GUIDE);
+        }
+        this.roles = newRoles;
+    }
+
 }
