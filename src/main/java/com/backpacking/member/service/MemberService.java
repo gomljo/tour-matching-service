@@ -11,4 +11,7 @@ public interface MemberService {
     Member verifyAuthenticationCode(VerificationDto.Request request);
 
     Member updateVerifiedStatus(Member member);
+    Member registerGuideRole(Member member);
+    Member findMemberBy(String email);
+    Member deleteGuideRole(Member member);
 }

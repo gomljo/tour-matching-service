@@ -1,18 +1,19 @@
 package com.backpacking.member.service;
 
+import com.backpacking.global.security.exception.security.SecurityException;
+import com.backpacking.global.security.util.AuthenticationUtil;
+import com.backpacking.global.security.util.PasswordUtil;
 import com.backpacking.member.domain.model.Member;
 import com.backpacking.member.dto.MemberRegisterDto;
 import com.backpacking.member.dto.VerificationDto;
 import com.backpacking.member.exception.MemberException;
 import com.backpacking.member.repository.MemberRepository;
-import com.backpacking.member.type.Roles;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
+import static com.backpacking.global.security.exception.security.SecurityExceptionCode.INVALID_ACCESS;
 import static com.backpacking.member.constants.VerifiedStatus.NOT_VERIFIED;
 import static com.backpacking.member.exception.MemberExceptionCode.*;
 
@@ -22,7 +23,8 @@ import static com.backpacking.member.exception.MemberExceptionCode.*;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-
+    private final PasswordUtil passwordUtil;
+    private final AuthenticationUtil authenticationUtil;
     @Override
     @Transactional
     public Member register(MemberRegisterDto.Request request, String authenticationCode) {
@@ -34,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(Member.builder()
                 .email(request.getEmail())
                 .address(request.getAddress())
-                .password(request.getPassword())
+                .password(passwordUtil.encode(request.getPassword()))
                 .phoneNumber(request.getPhoneNumber())
                 .verifiedStatus(NOT_VERIFIED)
                 .authenticationCode(authenticationCode)
@@ -47,8 +49,11 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public Member verifyAuthenticationCode(VerificationDto.Request request) {
 
-        Member member = memberRepository.findByEmail(request.getUserEmail())
-                .orElseThrow(() -> new MemberException(NO_SUCH_MEMBER));
+        if(authenticationUtil.isInvalidAccess(request.getUserEmail())){
+            throw new SecurityException(INVALID_ACCESS);
+        }
+
+        Member member = findMemberBy(request.getUserEmail());
 
         if (!member.isSameAuthCode(request.getAuthenticationCode())) {
             throw new MemberException(INVALID_AUTHENTICATION_CODE);
@@ -58,10 +63,33 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public Member updateVerifiedStatus(Member member) {
+
+        if(authenticationUtil.isInvalidAccess(member.getEmail())){
+            throw new SecurityException(INVALID_ACCESS);
+        }
+
         member.updateVerifiedStatus();
 
         return memberRepository.save(member);
     }
 
+    @Override
+    public Member findMemberBy(String email){
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberException(NO_SUCH_MEMBER));
+    }
+
+    @Override
+    public Member registerGuideRole(Member member){
+        member.registerGuideRole();
+        return memberRepository.save(member);
+    }
+
+    @Override
+    public Member deleteGuideRole(Member member){
+        member.deleteGuideRole();
+        return memberRepository.save(member);
+    }
 }
