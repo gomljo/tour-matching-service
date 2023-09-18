@@ -2,24 +2,24 @@ package com.backpacking.member.controller;
 
 import com.backpacking.global.security.config.SecurityConfig;
 import com.backpacking.global.security.filter.JwtAuthenticationFilter;
-import com.backpacking.global.security.token.provider.JwtTokenProvider;
-import com.backpacking.member.constants.VerifiedStatus;
+import com.backpacking.global.security.provider.token.JwtTokenProvider;
 import com.backpacking.member.domain.model.Member;
-import com.backpacking.member.domain.vo.Address;
 import com.backpacking.member.dto.MemberRegisterDto;
 import com.backpacking.member.dto.VerificationDto;
 import com.backpacking.member.exception.MemberException;
 import com.backpacking.member.service.MemberService;
 import com.backpacking.member.type.Roles;
+import com.backpacking.member.util.MemberHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -30,14 +30,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = MemberController.class)
-@Import({SecurityConfig.class})
-@AutoConfigureMockMvc
+@WebMvcTest(value = MemberController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class),
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtTokenProvider.class),
+        })
 class MemberControllerTest {
 
     @MockBean
@@ -46,24 +50,22 @@ class MemberControllerTest {
     @MockBean
     private MockMailService mailService;
 
-    @MockBean
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper mapper;
 
+    private final MemberHelper memberHelper = new MemberHelper();
+
+
     @Test
+    @WithMockUser
     @DisplayName("회원 가입 요청 성공")
     void success_register() throws Exception {
 
         // given
-        Member member = generateMember();
+        Member member = memberHelper.generateMember();
         given(mailService.generateAuthenticationCode())
                 .willReturn("123ER21122");
         given(memberService.register(any(), anyString()))
@@ -77,9 +79,10 @@ class MemberControllerTest {
 
         // then
         mockMvc.perform(post("/member/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request))
+                        .with(csrf())
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.memberId").value(member.getMemberId()))
                 .andExpect(jsonPath("$.email").value(member.getEmail()));
@@ -87,11 +90,12 @@ class MemberControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("회원 가입 요청 실패 - 이미 가입된 회원")
     void fail_register() throws Exception {
 
         // given
-        Member member = generateMember();
+        Member member = memberHelper.generateMember();
         given(mailService.generateAuthenticationCode())
                 .willReturn("123ER21122");
         given(memberService.register(any(), anyString()))
@@ -106,19 +110,22 @@ class MemberControllerTest {
         mockMvc.perform(post("/member/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
+                        .with(csrf())
                 )
+
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value(ALREADY_REGISTERED.name()))
                 .andExpect(jsonPath("$.descriptions").value(ALREADY_REGISTERED.getDescription()));
     }
 
     @Test
+    @WithMockUser
     @DisplayName("인증 코드 검증 성공")
     void success_verify() throws Exception {
 
         // given
-        Member member = generateMember();
-        Member updatedMember = generateVerifiedMember();
+        Member member = memberHelper.generateMember();
+        Member updatedMember = memberHelper.generateVerifiedMember();
 
         given(memberService.verifyAuthenticationCode(any()))
                 .willReturn(updatedMember);
@@ -132,6 +139,7 @@ class MemberControllerTest {
         mockMvc.perform(put("/member/verify")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
+                        .with(csrf())
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userEmail").value(updatedMember.getEmail()))
@@ -140,11 +148,12 @@ class MemberControllerTest {
 
 
     @Test
+    @WithMockUser
     @DisplayName("인증 코드 검증 실패 - 검증 코드 불일치")
     void fail_verify() throws Exception {
 
         // given
-        Member member = generateMember();
+        Member member = memberHelper.generateMember();
 
         given(memberService.verifyAuthenticationCode(any()))
                 .willThrow(new MemberException(INVALID_AUTHENTICATION_CODE));
@@ -157,37 +166,11 @@ class MemberControllerTest {
         mockMvc.perform(put("/member/verify")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
+                        .with(csrf())
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value(INVALID_AUTHENTICATION_CODE.name()))
                 .andExpect(jsonPath("$.descriptions").value(INVALID_AUTHENTICATION_CODE.getDescription()));
-    }
-
-
-    private Member generateMember(){
-        return Member.builder()
-                .memberId(1L)
-                .email("lifi.jw@gmail.com")
-                .password("1q!W23")
-                .address(new Address("korea", "seoul", "detail Address"))
-                .phoneNumber("010-111-1111")
-                .verifiedStatus(VerifiedStatus.NOT_VERIFIED)
-                .authenticationCode("123ER21122")
-                .roles(List.of(Roles.ROLE_TOURIST))
-                .build();
-    }
-
-    private Member generateVerifiedMember(){
-        return Member.builder()
-                .memberId(1L)
-                .email("lifi.jw@gmail.com")
-                .password("1q!W23")
-                .address(new Address("korea", "seoul", "detail Address"))
-                .phoneNumber("010-111-1111")
-                .verifiedStatus(VerifiedStatus.VERIFIED)
-                .authenticationCode("123ER21122")
-                .roles(List.of(Roles.ROLE_TOURIST))
-                .build();
     }
 
 }
